@@ -589,7 +589,7 @@ public class QuerydslBasicTest {
 
     @Test
     @Rollback(value = false)
-    public void bulkUpdate(){
+    public void bulkUpdate() {
         long count = queryFactory
                 .update(member)
                 .set(member.username, "비회원")
@@ -607,7 +607,7 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void bulkAdd(){
+    public void bulkAdd() {
         long count = queryFactory
                 .update(member)
                 .set(member.age, member.age.add(1)) // add, multiply 등 가능
@@ -615,10 +615,39 @@ public class QuerydslBasicTest {
     }
 
     @Test
-    public void bulkDelete(){
+    public void bulkDelete() {
         long count = queryFactory
                 .delete(member)
                 .where(member.age.lt(20))
                 .execute();
+    }
+
+    @Test
+    public void sqlFunction() {
+        List<String> result = queryFactory
+                .select(Expressions.stringTemplate("function('replace', {0}, {1}, {2})",
+                        member.username, "member", "M"))
+                .from(member)
+                .fetch();
+
+        for (String s : result) {
+            System.out.println("s = " + s);
+        }
+    }
+
+    @Test
+    public void sqlFunction2() {
+        List<String> fetch = queryFactory
+                .select(member.username)
+                .from(member)
+                .where(
+//                        member.username.eq(Expressions.stringTemplate("function('lower', {0})", member.username))
+                        member.username.eq(member.username.lower())
+                )
+                .fetch();
+
+        for (String s : fetch) {
+            System.out.println("s = " + s);
+        }
     }
 }
